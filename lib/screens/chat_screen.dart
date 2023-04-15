@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/widgets/chat/messages.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -35,22 +36,13 @@ class ChatScreen extends StatelessWidget {
           )
         ],
       ),
-      body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('chats/exwkvllfDrFVszvJhxXf/messages')
-              .snapshots(),
-          builder: (context, snapshot) =>
-              snapshot.connectionState == ConnectionState.waiting
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : ListView.builder(
-                      itemBuilder: (context, index) => Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(snapshot.data!.docs[index]['text']),
-                      ),
-                      itemCount: snapshot.data!.docs.length,
-                    )),
+      body: Container(
+        child: const Column(
+          children: [
+            Expanded(child: Messages()),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             FirebaseFirestore.instance
