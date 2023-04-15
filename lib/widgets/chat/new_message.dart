@@ -13,13 +13,18 @@ class _NewMessageState extends State<NewMessage> {
   String _message = '';
   final _controller = TextEditingController();
 
-  void _sendMessage() {
+  void _sendMessage() async {
     FocusScope.of(context).unfocus();
     final user = FirebaseAuth.instance.currentUser;
+    final username = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get();
     FirebaseFirestore.instance.collection('chat').add({
       'text': _message,
       'createdAt': DateTime.now(),
-      'userId': user!.uid,
+      'userId': user.uid,
+      'userName': username['username'],
     });
     _controller.clear();
     _message = '';
@@ -40,7 +45,9 @@ class _NewMessageState extends State<NewMessage> {
             ),
           ),
           IconButton(
-              onPressed: _message.trim().isEmpty ? null : _sendMessage,
+              onPressed: _message
+                  .trim()
+                  .isEmpty ? null : _sendMessage,
               icon: const Icon(Icons.send))
         ],
       ),
