@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
-  final void Function(String email, String suername, String password, bool isLogin) submitFn;
+  final Future<void> Function(
+    String email,
+    String suername,
+    String password,
+    bool isLogin,
+    BuildContext ctx,
+  ) submitFn;
 
   const AuthForm({Key? key, required this.submitFn}) : super(key: key);
 
@@ -15,14 +21,24 @@ class _AuthFormState extends State<AuthForm> {
   String _email = '';
   String _name = '';
   String _password = '';
+  bool _isLoading = false;
 
-  void _trySubmit() {
+  void _trySubmit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
     FocusScope.of(context).unfocus();
     _formKey.currentState!.save();
-    widget.submitFn(_email, _name, _password, _isLogin);
+
+    setState(() => _isLoading = true);
+    await widget.submitFn(
+      _email.trim(),
+      _name.trim(),
+      _password.trim(),
+      _isLogin,
+      context,
+    );
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -80,16 +96,21 @@ class _AuthFormState extends State<AuthForm> {
                   const SizedBox(
                     height: 12,
                   ),
-                  ElevatedButton(
-                    onPressed: _trySubmit,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Theme.of(context).colorScheme.primaryContainer),
-                      foregroundColor: MaterialStateProperty.all<Color>(
-                          Theme.of(context).colorScheme.onPrimaryContainer),
+                  if (_isLoading)
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  else
+                    ElevatedButton(
+                      onPressed: _trySubmit,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Theme.of(context).colorScheme.primaryContainer),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                            Theme.of(context).colorScheme.onPrimaryContainer),
+                      ),
+                      child: Text(_isLogin ? 'Login' : 'Sign up'),
                     ),
-                    child: Text(_isLogin ? 'Login' : 'Sign up'),
-                  ),
                   TextButton(
                       onPressed: () => setState(() => _isLogin = !_isLogin),
                       child: Text(_isLogin
