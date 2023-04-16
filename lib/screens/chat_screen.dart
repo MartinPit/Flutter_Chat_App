@@ -25,9 +25,8 @@ class _ChatScreenState extends State<ChatScreen> {
     FirebaseMessaging.onMessage.listen((message) {
       print(message);
     });
-    getToken();
+    fbm.subscribeToTopic('chat');
     super.initState();
-    FirebaseMessaging.instance.
   }
 
   @override
@@ -37,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: const Text('Chat'),
         actions: [
           DropdownButton(
+            underline: Container(),
             items: const [
               DropdownMenuItem(
                 value: 'logout',

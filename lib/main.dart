@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/screens/auth_screen.dart';
 import 'package:flutter_chat_app/screens/chat_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_chat_app/screens/splash_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -29,7 +28,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) => snapshot.hasData ? const ChatScreen() : const AuthScreen(),),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SplashScreen();
+          }
+
+          return snapshot.hasData ? const ChatScreen() : const AuthScreen();
+        },),
     );
   }
 }
